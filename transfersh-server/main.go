@@ -40,7 +40,7 @@ import (
 	"time"
 )
 
-const SERVER_INFO = "transfer.sh"
+const SERVER_INFO = "transfer.bnb.re"
 
 // parse request with maximum memory of _24Kilobits
 const _24K = (1 << 20) * 24

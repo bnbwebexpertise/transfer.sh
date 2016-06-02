@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{.Filename}} - transfer.sh</title>
+    <title>{{.Filename}} - transfer.bnb.re</title>
     <meta name="description" content="Easy and fast file sharing from the command-line.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -34,17 +34,17 @@
         a.src = g;
         m.parentNode.insertBefore(a, m)
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-    ga('create', 'UA-40833733-1', 'transfer.sh');
+    ga('create', 'UA-40515766-7', 'auto');
     ga('send', 'pageview');
     </script>
 
     <div id="navigation">
         <div class="wrapper">
-            <h1>transfer.sh</h1>
+            <a href="/">
+                <h1>transfer.bnb.re</h1>
+            </a>
             <ul class="hidden-xs">
-                <li><a href="#samples">sample use cases</a>
-                </li>
-                <li><a href="#contact">contact us</a>
+                <li><a href="/">home</a>
                 </li>
             </ul>
         </div>
@@ -70,17 +70,17 @@
 
         </div>
 
-    <div>
-        <a href="#" id="copy-link-btn" class="btn-cta btn">copy link</a> &nbsp;&nbsp;
-        <a href="{{.Url}}" class="btn-cta btn"> download</i> </a>
-        <div id="copy-link-wrapper" class="copy-link-wrapper">
-            <p>Press Ctrl / CMD + C to copy link to your clipboard.</p>
-            <input readonly="readonly" type="text" value="{{.Url}}" />
+        <div>
+            <a href="#" id="copy-link-btn" class="btn-cta btn">copy link</a> &nbsp;&nbsp;
+            <a href="{{.Url}}" class="btn-cta btn"> download</i> </a>
+            <div id="copy-link-wrapper" class="copy-link-wrapper">
+                <p>Press Ctrl / CMD + C to copy link to your clipboard.</p>
+                <input readonly="readonly" type="text" value="{{.Url}}" />
+            </div>
+            <div id="overlay" class="overlay"></div>
         </div>
-        <div id="overlay" class="overlay"></div>
+            <script src="scripts/clipboard.js"></script>
     </div>
-        <script src="scripts/clipboard.js"></script>
-
 </section>
 
 
@@ -112,7 +112,7 @@
         e.src = '//www.google-analytics.com/analytics.js';
         r.parentNode.insertBefore(e, r)
     }(window, document, 'script', 'ga'));
-    ga('create', 'UA-40833733-1', 'transfer.sh');
+    ga('create', 'UA-40515766-7', 'auto');
     ga('send', 'pageview');
     </script>
 

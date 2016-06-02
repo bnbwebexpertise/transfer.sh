@@ -586,13 +586,13 @@ func RedirectHandler(h http.Handler) http.HandlerFunc {
 		} else if ipAddrFromRemoteAddr(r.Host) == "127.0.0.1" {
 		} else if strings.HasSuffix(ipAddrFromRemoteAddr(r.Host), ".elasticbeanstalk.com") {
 		} else if ipAddrFromRemoteAddr(r.Host) == "jxm5d6emw5rknovg.onion" {
-		} else if ipAddrFromRemoteAddr(r.Host) == "transfer.sh" {
+		} else if ipAddrFromRemoteAddr(r.Host) == "transfer.bnb.re" {
 			if r.Header.Get("X-Forwarded-Proto") != "https" && r.Method == "GET" {
-				http.Redirect(w, r, "https://transfer.sh"+r.RequestURI, 301)
+				http.Redirect(w, r, "https://transfer.bnb.re"+r.RequestURI, 301)
 				return
 			}
-		} else if ipAddrFromRemoteAddr(r.Host) != "transfer.sh" {
-			http.Redirect(w, r, "https://transfer.sh"+r.RequestURI, 301)
+		} else if ipAddrFromRemoteAddr(r.Host) != "transfer.bnb.re" {
+			http.Redirect(w, r, "https://transfer.bnb.re"+r.RequestURI, 301)
 			return
 		}
 
