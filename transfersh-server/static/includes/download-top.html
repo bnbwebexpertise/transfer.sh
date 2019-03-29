@@ -1,0 +1,12 @@
+<div class="baseline">
+  <p class="page-title">{{.Filename}}</p>
+  <p>Type : <b>{{.ContentType}}</b></p>
+  <p>Taille : <b>{{.ContentLength | format "#,###."}}</b> octets</p>
+</div>
+
+<div>
+  <a href="{{.Url}}" class="button --download">
+    <span class="oi oi-data-transfer-download" aria-hidden="true"></span>
+    télécharger
+  </a>
+</div>

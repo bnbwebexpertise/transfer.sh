@@ -270,24 +270,22 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 
 	c := clamd.NewClamd(config.CLAMAV_DAEMON_HOST)
 
-	response, err := c.ScanStream(reader)
+    abort := make(chan bool)
+	response, err := c.ScanStream(reader, abort)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	var b string
+	select {
+    	case s := <-response:
+    		w.Write([]byte(fmt.Sprintf("%v\n", s.Status)))
+    	case <-time.After(time.Second * 60):
+    		abort <- true
+    }
 
-	for s := range response {
-		b += s
-
-		if !strings.HasPrefix(s, "stream: ") {
-			continue
-		}
-
-		w.Write([]byte(fmt.Sprintf("%v\n", s[8:])))
-	}
+	close(abort)
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request) {
