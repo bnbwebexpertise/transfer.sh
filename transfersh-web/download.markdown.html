@@ -10,30 +10,28 @@ include "includes/head.html"
 
 <body  id="download">
 
-    include "includes/ga.html"
-    include "includes/navigation.html"
+include "includes/ga.html"
 
-<section id="home">
-    <div class="wrapper">
+<div class="body-container container-fluid p-0 ">
+    <div class="row">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <div class="sidebar d-flex align-items-center justify-content-center">
+                <div class="sidebar-content">
+                    <h1>
+                        WeTransfer <small>| B&amp;B Web Expertise</small>
+                    </h1>
 
-        include "includes/download-top.html"
+                    include "includes/download-top.html"
 
-        <div class="row animated fadeInDown">
-            <div id="from-terminal" class=" box col-md-8  col-md-offset-2 col-xs-12">
-                <div class="terminal-top">
-                </div>
-                <div id="terminal" class="terminal">
                     <div id="md-preview">{{.Content}}</div>
+
                 </div>
             </div>
         </div>
-    <br/>
-
-</section>
-
-
-    include "includes/footer.html" 
-    include "includes/js.html"
+    </div>
+</div>
+<script src="https://wetransfer.bnb.re/js/manifest.js"></script>
+<script src="https://wetransfer.bnb.re/js/vendor.js"></script>
+<script src="https://wetransfer.bnb.re/js/app.js"></script>
 </body>
-
 </html>
