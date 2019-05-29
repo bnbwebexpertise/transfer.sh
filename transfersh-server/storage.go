@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime"
 	"os"
@@ -17,7 +18,7 @@ import (
 type Storage interface {
 	Get(token string, filename string) (reader io.ReadCloser, contentType string, contentLength uint64, err error)
 	Head(token string, filename string) (contentType string, contentLength uint64, err error)
-	Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64) error
+	Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64, expireTimestamp int64) error
 	IsNotExist(err error) bool
 }
 
@@ -69,7 +70,7 @@ func (s *LocalStorage) IsNotExist(err error) bool {
 	return os.IsNotExist(err)
 }
 
-func (s *LocalStorage) Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64) error {
+func (s *LocalStorage) Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64, expireTimestamp int64) error {
 	var f io.WriteCloser
 	var err error
 
@@ -87,6 +88,12 @@ func (s *LocalStorage) Put(token string, filename string, reader io.Reader, cont
 	defer f.Close()
 
 	if _, err = io.Copy(f, reader); err != nil {
+		return err
+	}
+
+	meta := []byte(strconv.FormatInt(expireTimestamp, 10))
+
+	if err = ioutil.WriteFile(fmt.Sprintf("%s.expires", path), meta, 0644); err != nil {
 		return err
 	}
 
@@ -153,7 +160,7 @@ func (s *S3Storage) Get(token string, filename string) (reader io.ReadCloser, co
 	return
 }
 
-func (s *S3Storage) Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64) (err error) {
+func (s *S3Storage) Put(token string, filename string, reader io.Reader, contentType string, contentLength uint64, expireTimestamp int64) (err error) {
 	key := fmt.Sprintf("%s/%s", token, filename)
 
 	var (

@@ -44,12 +44,13 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	text_template "text/template"
 	"time"
 
-	clamd "github.com/dutchcoders/go-clamd"
+	"github.com/dutchcoders/go-clamd"
 
 	"github.com/gorilla/mux"
 	"github.com/kennygrant/sanitize"
@@ -192,10 +193,26 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		for _, fheader := range fheaders {
 			filename := sanitize.Path(filepath.Base(fheader.Filename))
 			contentType := fheader.Header.Get("Content-Type")
+			expiresAfter := fheader.Header.Get("Expires-After")
 
 			if contentType == "" {
 				contentType = mime.TypeByExtension(filepath.Ext(fheader.Filename))
 			}
+
+			matched, _ := regexp.Match(`^\d+$`, []byte(expiresAfter))
+			expireTimestamp := int64(0)
+
+			if matched {
+				expireTimestamp, _ = strconv.ParseInt(expiresAfter, 10, 64)
+			}
+
+			if !matched || expireTimestamp < time.Now().Unix() {
+				expiresAfter = strconv.FormatInt(time.Now().Add(+7*24*time.Hour).Unix(), 10)
+			} else if expireTimestamp > time.Now().Add(99*365*24*time.Hour).Unix() {
+				expiresAfter = strconv.FormatInt(time.Now().Add(+99*365*24*time.Hour).Unix(), 10)
+			}
+
+			expireTimestamp, _ = strconv.ParseInt(expiresAfter, 10, 64)
 
 			var f io.Reader
 			var err error
@@ -242,7 +259,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 			log.Printf("Uploading %s %s %d %s", token, filename, contentLength, contentType)
 
-			if err = storage.Put(token, filename, reader, contentType, uint64(contentLength)); err != nil {
+			if err = storage.Put(token, filename, reader, contentType, uint64(contentLength), expireTimestamp); err != nil {
 				log.Printf("%s", err.Error())
 				http.Error(w, err.Error(), 500)
 				return
@@ -270,7 +287,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 
 	c := clamd.NewClamd(config.CLAMAV_DAEMON_HOST)
 
-    abort := make(chan bool)
+	abort := make(chan bool)
 	response, err := c.ScanStream(reader, abort)
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -279,11 +296,11 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	select {
-    	case s := <-response:
-    		w.Write([]byte(fmt.Sprintf("%v\n", s.Status)))
-    	case <-time.After(time.Second * 60):
-    		abort <- true
-    }
+	case s := <-response:
+		w.Write([]byte(fmt.Sprintf("%v\n", s.Status)))
+	case <-time.After(time.Second * 60):
+		abort <- true
+	}
 
 	close(abort)
 }
@@ -342,10 +359,26 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	contentType := r.Header.Get("Content-Type")
+	expiresAfter := r.Header.Get("Expires-After")
 
 	if contentType == "" {
 		contentType = mime.TypeByExtension(filepath.Ext(vars["filename"]))
 	}
+
+	matched, _ := regexp.Match(`^\d+$`, []byte(expiresAfter))
+	expireTimestamp := int64(0)
+
+	if matched {
+		expireTimestamp, _ = strconv.ParseInt(expiresAfter, 10, 64)
+	}
+
+	if !matched || expireTimestamp < time.Now().Unix() {
+		expiresAfter = strconv.FormatInt(time.Now().Add(+7*24*time.Hour).Unix(), 10)
+	} else if expireTimestamp > time.Now().Add(99*365*24*time.Hour).Unix() {
+		expiresAfter = strconv.FormatInt(time.Now().Add(+99*365*24*time.Hour).Unix(), 10)
+	}
+
+	expireTimestamp, _ = strconv.ParseInt(expiresAfter, 10, 64)
 
 	token := Encode(10000000 + int64(rand.Intn(1000000000)))
 
@@ -353,7 +386,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
-	if err = storage.Put(token, filename, reader, contentType, uint64(contentLength)); err != nil {
+	if err = storage.Put(token, filename, reader, contentType, uint64(contentLength), expireTimestamp); err != nil {
 		log.Printf("%s", err.Error())
 		http.Error(w, errors.New("Could not save file").Error(), 500)
 		return
