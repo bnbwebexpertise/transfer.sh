@@ -73,6 +73,25 @@ docker build -t transfersh .
 docker run --publish 8080:8080 --rm transfersh --provider local --basedir /tmp/
 ```
 
+## Cleanup local straoge
+
+```
+#!/bin/bash
+VOLUME="/var/tmp"
+FILES=$(find $VOLUME -type f -name *.expires)
+TIMESTAMP=$(date '+%s')
+
+for file in $FILES
+do
+   expires=$(head -1 $file)
+   if [[ $expires -lt $TIMESTAMP ]]
+   then
+     rm -rf "$(echo $file | cut -d'.' -f1)"
+     rm $file
+   fi 
+done
+```
+
 ## Contributions
 
 Contributions are welcome.
